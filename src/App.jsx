@@ -173,7 +173,7 @@ function App() {
         <p>
           {lang === 'zh'
             ? '实时世界新闻 · 拖动地球，点击光点查看'
-            : 'The world’s news in real time · drag to explore'}
+            : "The world’s news in real time · drag to explore"}
         </p>
         <button
           className="lang-btn"
