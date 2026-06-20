@@ -55,18 +55,6 @@ export default function Sun() {
           toneMapped={false}
         />
       </sprite>
-      {/* Outer corona — occluded by the globe's depth, so it peeks softly
-          around the rim when the sun passes behind the planet. */}
-      <sprite scale={[4.6, 4.6, 1]}>
-        <spriteMaterial
-          map={glowTex}
-          blending={THREE.AdditiveBlending}
-          transparent
-          opacity={0.4}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </sprite>
     </group>
   )
 }
