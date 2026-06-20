@@ -1,0 +1,10 @@
+[Unit]
+Description=Regenerate Newsphere news.json
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/newsphere/server/update-news.sh
+# The pipeline (GDELT download + model inference) can take a few minutes.
+TimeoutStartSec=900

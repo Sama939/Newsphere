@@ -51,6 +51,10 @@ const localPlace = localZone.split('/').pop().replace(/_/g, ' ')
 //   Email Routing) so anything @newsphere.live lands in your Gmail.
 const SUPPORT_URL = 'https://buymeacoffee.com/samlabs'
 const FEEDBACK_EMAIL = 'support@newsphere.live'
+// Where the front-end fetches news data. In dev (and local builds) it reads the
+// bundled file; in production set VITE_NEWS_URL (e.g. the VPS data subdomain
+// https://data.newsphere.live/news.json) as a Cloudflare Pages build variable.
+const NEWS_URL = import.meta.env.VITE_NEWS_URL || '/data/news.json'
 
 function App() {
   const [now, setNow] = useState(() => DateTime.now())
@@ -111,7 +115,7 @@ function App() {
     try {
       const headers = {}
       if (newsEtagRef.current) headers['If-None-Match'] = newsEtagRef.current
-      const res = await fetch('/data/news.json', { headers, cache: 'no-store' })
+      const res = await fetch(NEWS_URL, { headers, cache: 'no-store' })
       if (res.status === 304) return // not modified
       const etag = res.headers.get('etag')
       if (etag) newsEtagRef.current = etag

@@ -333,6 +333,8 @@ function getRecentTimestamps() {
 }
 
 const IS_WINDOWS = process.platform === 'win32'
+// Windows ships `python`; Linux/macOS (and the VPS) use `python3`.
+const PY = IS_WINDOWS ? 'python' : 'python3'
 
 function downloadAndExtract(stamp, workDir) {
   const url = `https://data.gdeltproject.org/gdeltv2/${stamp}.export.CSV.zip`
@@ -721,7 +723,7 @@ function main() {
   const scriptPath = path.join(process.cwd(), 'scripts', 'dedup-semantic.py')
   if (fs.existsSync(scriptPath)) {
     try {
-      const result = execSync(`python "${scriptPath}"`, {
+      const result = execSync(`${PY} "${scriptPath}"`, {
         input: JSON.stringify(combined),
         encoding: 'utf-8',
         timeout: 120_000,
@@ -740,7 +742,7 @@ function main() {
   const translateScript = path.join(process.cwd(), 'scripts', 'translate.py')
   if (fs.existsSync(translateScript)) {
     try {
-      const result = execSync(`python "${translateScript}"`, {
+      const result = execSync(`${PY} "${translateScript}"`, {
         input: JSON.stringify(events),
         encoding: 'utf-8',
         timeout: 180_000,

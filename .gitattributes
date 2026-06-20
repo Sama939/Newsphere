@@ -1,0 +1,9 @@
+# Force LF for files that must run on Linux (the VPS / CI), regardless of the
+# committer's OS — CRLF would break shell scripts and systemd units.
+*.sh            text eol=lf
+server/*.conf   text eol=lf
+server/*.service text eol=lf
+server/*.timer  text eol=lf
+*.mjs           text eol=lf
+*.js            text eol=lf
+*.yml           text eol=lf
