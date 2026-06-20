@@ -1,8 +1,13 @@
 name: Update news markers
 
+# NOTE: auto-schedule is intentionally disabled. This job only installs Node,
+# but the pipeline also needs Python + transformers/torch + sentencepiece for
+# self-hosted translation and semantic dedup. Without them those steps are
+# skipped, producing English-only, un-deduped data — which would overwrite the
+# good data on every run. Until the workflow is upgraded to install the Python
+# deps (with model caching), refresh data locally (`node scripts/fetch-news.mjs`)
+# or trigger this manually. See deployment notes.
 on:
-  schedule:
-    - cron: '7 * * * *' # every hour, offset to avoid the top-of-hour rush
   workflow_dispatch:
 
 permissions:
