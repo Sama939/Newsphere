@@ -45,16 +45,6 @@ export default function Sun() {
         <sphereGeometry args={[0.22, 32, 32]} />
         <meshBasicMaterial color="#fff6e0" toneMapped={false} />
       </mesh>
-      {/* Inner glow */}
-      <sprite scale={[1.9, 1.9, 1]}>
-        <spriteMaterial
-          map={glowTex}
-          blending={THREE.AdditiveBlending}
-          transparent
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </sprite>
     </group>
   )
 }
