@@ -44,10 +44,6 @@ const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 const localPlace = localZone.split('/').pop().replace(/_/g, ' ')
 
 // --- Site config -------------------------------------------------------------
-// Sam: SUPPORT_URL — create a personal Buy Me a Coffee account at
-//   https://buymeacoffee.com, then paste your handle below (replace
-//   <your-handle>). A personal handle works across all your projects.
-// FEEDBACK_EMAIL — set up a free catch-all forward for your domain (Cloudflare
 //   Email Routing) so anything @newsphere.live lands in your Gmail.
 const SUPPORT_URL = 'https://buymeacoffee.com/samlabs'
 const FEEDBACK_EMAIL = 'support@newsphere.live'
