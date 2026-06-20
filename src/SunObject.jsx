@@ -3,34 +3,75 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { getSunDirection } from './sun'
 
-// How far out to place the sun. Far enough to read as a distant light source,
-// near enough (< stars at 50) to feel present. It sits along the exact same
-// vector the day/night shader uses, so it always aligns with the lit side and
-// the terminator, and moves correctly as the user spins the globe.
 const SUN_DISTANCE = 8
 
-// Build a soft radial-gradient sprite used for the glow/corona.
-function makeGlowTexture() {
-  const size = 128
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = size
-  const ctx = canvas.getContext('2d')
-  const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  g.addColorStop(0.0, 'rgba(255, 255, 255, 1)')
-  g.addColorStop(0.3, 'rgba(255, 255, 255, 0.5)')
-  g.addColorStop(0.6, 'rgba(255, 255, 255, 0.1)')
-  g.addColorStop(1.0, 'rgba(255, 255, 255, 0)')
-  ctx.fillStyle = g
-  ctx.fillRect(0, 0, size, size)
-  const tex = new THREE.CanvasTexture(canvas)
-  tex.needsUpdate = true
-  return tex
+// Billboard quad that always faces the camera, drawn in clip space so it
+// never distorts. The fragment shader computes a smooth radial falloff in
+// high precision — no canvas dithering, no mobile artifacts.
+const glowVert = /* glsl */`
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  // Place the quad in view space (always faces camera) then project.
+  vec4 mvPos = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+  float scale = 1.8;
+  mvPos.xy += (position.xy * scale);
+  gl_Position = projectionMatrix * mvPos;
 }
+`
+
+const glowFrag = /* glsl */`
+precision highp float;
+varying vec2 vUv;
+uniform vec3 uColor;
+uniform float uOpacity;
+void main() {
+  float d = length(vUv - 0.5) * 2.0; // 0 at center, 1 at edge
+  if (d > 1.0) discard;
+  // Smooth power falloff: bright core fades to transparent edge
+  float alpha = pow(1.0 - d, 2.5) * uOpacity;
+  gl_FragColor = vec4(uColor * alpha, alpha);
+}
+`
 
 export default function Sun() {
   const groupRef = useRef()
-  const glowTex = useMemo(() => makeGlowTexture(), [])
   const tmp = useMemo(() => new THREE.Vector3(), [])
+
+  const innerMat = useMemo(() => new THREE.ShaderMaterial({
+    vertexShader: glowVert,
+    fragmentShader: glowFrag,
+    uniforms: {
+      uColor: { value: new THREE.Color(1.0, 0.97, 0.88) },
+      uOpacity: { value: 0.85 },
+    },
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  }), [])
+
+  const outerMat = useMemo(() => new THREE.ShaderMaterial({
+    vertexShader: /* glsl */`
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vec4 mvPos = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+        float scale = 4.2;
+        mvPos.xy += (position.xy * scale);
+        gl_Position = projectionMatrix * mvPos;
+      }
+    `,
+    fragmentShader: glowFrag,
+    uniforms: {
+      uColor: { value: new THREE.Color(1.0, 0.92, 0.75) },
+      uOpacity: { value: 0.28 },
+    },
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  }), [])
 
   useFrame(() => {
     if (!groupRef.current) return
@@ -40,7 +81,15 @@ export default function Sun() {
 
   return (
     <group ref={groupRef}>
-      {/* Bright solid core */}
+      {/* Outer corona billboard */}
+      <mesh material={outerMat}>
+        <planeGeometry args={[1, 1]} />
+      </mesh>
+      {/* Inner glow billboard */}
+      <mesh material={innerMat}>
+        <planeGeometry args={[1, 1]} />
+      </mesh>
+      {/* Solid core sphere */}
       <mesh>
         <sphereGeometry args={[0.22, 32, 32]} />
         <meshBasicMaterial color="#fff6e0" toneMapped={false} />
