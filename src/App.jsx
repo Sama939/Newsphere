@@ -58,7 +58,9 @@ const NEWS_URL = import.meta.env.VITE_NEWS_URL || '/data/news.json'
 
 function App() {
   const [now, setNow] = useState(() => DateTime.now())
-  const [lang, setLang] = useState('zh')
+  const [lang, setLang] = useState(() =>
+    navigator.language?.startsWith('zh') ? 'zh' : 'en'
+  )
   const langRef = useRef('zh')
   langRef.current = lang
   const [showPrivacy, setShowPrivacy] = useState(false)
