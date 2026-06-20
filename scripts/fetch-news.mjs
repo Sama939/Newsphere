@@ -406,10 +406,16 @@ function processRow(cols, buckets) {
 // event's text clearly belongs to a non-violent domain AND contains no real
 // markers of violence, demote it to a neutral "disapprove" category so it
 // shows a dispute icon instead of crossed swords.
-const VIOLENCE_CATS = new Set(['fight', 'assault', 'mass-violence', 'force-threat', 'coerce'])
-// Real markers of violence — if present, keep the violent category/icon.
+// Only the categories most often produced by METAPHORICAL conflict language
+// ("the US fought with the UK over a tax", "lawmakers clash") are eligible for
+// demotion. We deliberately leave GDELT's stronger codes — assault,
+// force-threat, mass-violence — untouched: GDELT coded those from the full
+// article (which we never see), so overriding them risks downplaying a real
+// threat (e.g. an explosive at an airport whose slug headline never says so).
+const DEMOTABLE_CATS = new Set(['fight', 'coerce'])
+// Real markers of violence/threat — if present, keep the violent category.
 // Checked first so e.g. "police opened fire, two killed" stays a fight.
-const REAL_VIOLENCE = /\b(kill|killed|dead|death|casualt|troops?|soldiers?|militar|missile|airstrike|air ?strike|drone|bombing|bombed|shelling|gunmen|gunfire|opened fire|exchanged fire|massacre|wounded|injured|militant|insurgent|offensive|invasion|raid|warplane|rocket|artillery|hostage|terror|stabb|shooting)\b/i
+const REAL_VIOLENCE = /\b(kill|killed|dead|death|casualt|troops?|soldiers?|militar|missile|airstrike|air ?strike|drone|bombing|bombed|\bbomb\b|explos|blast|detonat|shelling|gunmen|gunfire|opened fire|exchanged fire|massacre|wounded|injured|militant|insurgent|offensive|invasion|raid|warplane|rocket|artillery|hostage|hijack|siege|evacuat|terror|stabb|shooting)\b/i
 // Political / legal / economic disputes — show contention (👎), not war.
 const DISPUTE_HINTS = /\b(tax|taxes|tariff|trade|lawmaker|senate|congress|parliament|court|lawsuit|ruling|bill|legislation|regulation|election|vote|ballot|budget|economy|economic|policy|patent|copyright|antitrust|subsidy|sanction|talks?|summit|treaty|hearing|envoy|diplomat)\b/i
 // Travel / infrastructure / weather / accidents / civic life — neutral news (📰).
@@ -418,7 +424,7 @@ const NEUTRAL_HINTS = /\b(airport|airline|flight|passenger|travel|transport|trai
 // Returns { category, demoted } — demoted=true when a miscoded violence
 // category was softened, so the caller can also cap its severity level.
 function refineCategory(category, summary) {
-  if (!VIOLENCE_CATS.has(category) || !summary) return { category, demoted: false }
+  if (!DEMOTABLE_CATS.has(category) || !summary) return { category, demoted: false }
   if (REAL_VIOLENCE.test(summary)) return { category, demoted: false }
   if (DISPUTE_HINTS.test(summary)) return { category: 'disapprove', demoted: true }
   if (NEUTRAL_HINTS.test(summary)) return { category: 'other', demoted: true }
