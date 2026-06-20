@@ -303,11 +303,6 @@ function App() {
             ↺
           </button>
         </div>
-        <div className="footer-disclaimer">
-          {lang === 'zh'
-            ? '地名标注来自 GDELT 公开数据库，自动生成，不代表本站任何立场。'
-            : 'Place names are auto-generated from the GDELT public database and do not represent any position of this site.'}
-        </div>
         <div className="footer-links">
           <a
             className="support-link"
