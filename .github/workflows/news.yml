@@ -1,17 +1,21 @@
 name: Update news markers
 
-# NOTE: auto-schedule is intentionally disabled. This job only installs Node,
-# but the pipeline also needs Python + transformers/torch + sentencepiece for
-# self-hosted translation and semantic dedup. Without them those steps are
-# skipped, producing English-only, un-deduped data — which would overwrite the
-# good data on every run. Until the workflow is upgraded to install the Python
-# deps (with model caching), refresh data locally (`node scripts/fetch-news.mjs`)
-# or trigger this manually. See deployment notes.
+# Regenerates public/data/news.json on a schedule and pushes it. Because
+# Cloudflare Pages auto-deploys on every push to the repo, the live site picks
+# up the fresh data automatically. The pipeline needs Node (main script) plus
+# Python + transformers/torch + sentencepiece (self-hosted EN→ZH translation
+# and semantic dedup), so we install and cache those here.
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '17 */3 * * *' # every 3 hours (offset off the hour). Lower if you want fresher data; watch CI/Pages quotas.
+  workflow_dispatch: {} # lets you run it manually from the Actions tab
 
 permissions:
   contents: write
+
+concurrency:
+  group: news-update
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -23,7 +27,27 @@ jobs:
         with:
           node-version: 20
 
-      - name: Fetch and rank GDELT events
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Cache pip wheels and the downloaded Hugging Face models so subsequent
+      # runs don't re-download torch (~200MB) and the opus-mt / MiniLM models.
+      - name: Cache pip + Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/huggingface
+          key: news-ml-${{ runner.os }}-v1
+
+      - name: Install Python deps (CPU-only torch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install transformers sentencepiece
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Fetch, rank, translate GDELT events
         run: node scripts/fetch-news.mjs
 
       - name: Commit updated news.json
@@ -31,5 +55,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add public/data/news.json
-          git diff --staged --quiet || git commit -m "chore: update news data"
+          git diff --staged --quiet || git commit -m "chore: update news data [skip ci]"
           git push
