@@ -316,7 +316,9 @@ function App() {
           </a>
           <a
             className="footer-link-btn"
-            href={`mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent('Newsphere feedback')}`}
+            href={`https://mail.google.com/mail/?view=cm&to=${FEEDBACK_EMAIL}&su=${encodeURIComponent('Newsphere feedback')}`}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {lang === 'zh' ? '反馈' : 'Feedback'}
           </a>
