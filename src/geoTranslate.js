@@ -215,8 +215,8 @@ const GEO = {
   // ── Special regions ──
   'Gaza Strip': '加沙地带',
   'West Bank': '约旦河西岸',
-  'Taiwan': '台湾',
-  'Hong Kong': '香港',
+  'Taiwan': '中国台湾',
+  'Hong Kong': '中国香港',
   'Crimea': '克里米亚',
   'Kosovo': '科索沃',
   // ── Major cities ──

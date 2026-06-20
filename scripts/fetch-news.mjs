@@ -4,10 +4,9 @@ import path from 'path'
 import os from 'os'
 import { COUNTRY_CENTROIDS } from './countryCentroids.mjs'
 
-// How many 15-minute GDELT export files to pull (48 = last 12 hours). A wider
-// window so the day's major events (often reported over many hours) surface,
-// not just the last 3 hours. Users can still narrow via the time filter.
-const LOOKBACK_FILES = 48
+// How many 15-minute GDELT export files to pull (96 = last 24 hours). A wide
+// window so the day's major events surface; users narrow via the time filter.
+const LOOKBACK_FILES = 96
 const TOP_N = 50
 
 // Per-country quota so the feed isn't monopolised by whichever country has the

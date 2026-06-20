@@ -144,6 +144,14 @@ body {
   color: #fff;
   border-color: #6b7a9a;
 }
+.footer-disclaimer {
+  font-size: 0.62rem;
+  color: #4a5568;
+  text-align: center;
+  margin-top: 0.3rem;
+  padding: 0 1rem;
+  line-height: 1.4;
+}
 .footer-links {
   display: flex;
   align-items: center;
