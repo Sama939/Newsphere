@@ -81,6 +81,7 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 18px rgba(127, 217, 255, 0.25);
+  padding-bottom: 0.1em;
 }
 
 .app-header p {
