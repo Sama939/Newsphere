@@ -22,7 +22,7 @@ export default function PrivacyPolicy({ lang, onClose }) {
             <h3>4. 你的权利</h3>
             <p>你可以随时清除浏览器存储以删除所有本地数据。我们不出售、不交易你的任何数据。</p>
             <h3>5. 联系方式</h3>
-            <p>如有疑问，请联系：support@newsphere.live</p>
+            <p>如有疑问，请联系：<a href="mailto:support@newsphere.live">support@newsphere.live</a></p>
           </div>
         ) : (
           <div className="modal-body">
@@ -35,7 +35,7 @@ export default function PrivacyPolicy({ lang, onClose }) {
             <h3>4. Your rights</h3>
             <p>You can clear your browser storage at any time to delete all local data. We never sell or trade your data.</p>
             <h3>5. Contact</h3>
-            <p>Questions? Contact: support@newsphere.live</p>
+            <p>Questions? Contact: <a href="mailto:support@newsphere.live">support@newsphere.live</a></p>
           </div>
         )}
       </div>
