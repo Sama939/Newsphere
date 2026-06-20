@@ -8,6 +8,17 @@ import { COUNTRY_CENTROIDS } from './countryCentroids.mjs'
 const LOOKBACK_FILES = 12
 const TOP_N = 50
 
+// Per-country quota so the feed isn't monopolised by whichever country has the
+// most English-language coverage (usually the US). Major countries get a
+// higher cap (they genuinely generate more news); everyone else a smaller one,
+// which lets smaller regions surface instead of being buried.
+const MAJOR_COUNTRIES = new Set([
+  'United States', 'China', 'Russia', 'United Kingdom', 'India', 'Israel',
+  'Ukraine', 'Iran', 'Germany', 'France', 'Japan',
+])
+const MAJOR_COUNTRY_CAP = 6
+const OTHER_COUNTRY_CAP = 3
+
 // Soft/lifestyle news topics pulled from the GDELT DOC 2.0 full-text API,
 // which (unlike the CAMEO Events dataset) covers sports / entertainment /
 // tech. Each topic gets its own marker icon + colour on the globe.
@@ -630,7 +641,26 @@ function main() {
     }
     return true
   })
-  const top = all.slice(0, TOP_N)
+  // Apply the per-country quota. `all` is already sorted by score, so we keep
+  // the highest-scoring events within each country's cap; the rest become
+  // overflow used only to backfill if quotas leave us short of TOP_N.
+  const countryOf = (loc) => (loc ? loc.split(/ · |,\s*/).pop().trim() : '')
+  const countryCounts = new Map()
+  const picked = []
+  const overflow = []
+  for (const b of all) {
+    const country = countryOf(b.location)
+    const cap = MAJOR_COUNTRIES.has(country) ? MAJOR_COUNTRY_CAP : OTHER_COUNTRY_CAP
+    const n = countryCounts.get(country) || 0
+    if (country && n >= cap) { overflow.push(b); continue }
+    countryCounts.set(country, n + 1)
+    picked.push(b)
+  }
+  const top = picked.slice(0, TOP_N)
+  for (const b of overflow) {
+    if (top.length >= TOP_N) break
+    top.push(b)
+  }
 
   const candidates = top.map((b, i) => ({
     id: i,
