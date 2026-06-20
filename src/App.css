@@ -86,6 +86,9 @@ body {
 .app-header p {
   font-size: 0.85rem;
   color: #9aa8c7;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .local-panel {

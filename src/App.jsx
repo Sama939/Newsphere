@@ -166,8 +166,8 @@ function App() {
         <h1><span className="brand-emoji">🌍</span><span className="brand-name">Newsphere</span></h1>
         <p>
           {lang === 'zh'
-            ? (isTouch ? '实时世界新闻 · 拖动旋转，点击光点查看' : '实时世界新闻 · 拖动旋转地球，点击光点查看详情')
-            : (isTouch ? 'The world’s news in real time · drag to explore' : 'The world’s news in real time · drag to spin, click a marker to read')}
+            ? '实时世界新闻 · 拖动地球，点击光点查看'
+            : 'The world’s news in real time · drag to explore'}
         </p>
         <button
           className="lang-btn"
