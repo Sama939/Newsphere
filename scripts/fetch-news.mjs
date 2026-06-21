@@ -250,7 +250,12 @@ function cleanSingleLocation(loc) {
     seen.add(key)
     parts.push(display)
   }
-  return parts.join(', ')
+  const result = parts.join(', ')
+  // Catch any Gaza/West Bank variant GDELT uses — regardless of exact format.
+  const resultLow = result.toLowerCase()
+  if (resultLow.includes('gaza')) return 'Gaza, Palestine'
+  if (resultLow.includes('west bank')) return 'West Bank, Palestine'
+  return result
 }
 
 // Merge several distinct GDELT location strings into one display string.
