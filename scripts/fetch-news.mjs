@@ -222,7 +222,10 @@ function urlToSummary(url, category) {
 // Manual overrides for GDELT location strings that are politically inaccurate.
 const LOCATION_OVERRIDES = {
   'gaza, israel': 'Gaza, Palestine',
+  'gaza strip, israel': 'Gaza, Palestine',
+  'gaza strip': 'Gaza, Palestine',
   'west bank, israel': 'West Bank, Palestine',
+  'west bank': 'West Bank, Palestine',
 }
 
 // Clean a single GDELT location string ("City, District, Country"):
