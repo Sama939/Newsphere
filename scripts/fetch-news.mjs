@@ -219,11 +219,19 @@ function urlToSummary(url, category) {
 }
 
 // GDELT DATEADDED is YYYYMMDDHHMMSS in UTC.
+// Manual overrides for GDELT location strings that are politically inaccurate.
+const LOCATION_OVERRIDES = {
+  'gaza, israel': 'Gaza, Palestine',
+  'west bank, israel': 'West Bank, Palestine',
+}
+
 // Clean a single GDELT location string ("City, District, Country"):
 // strip "(general)" suffix, trailing GDELT admin asterisks, and collapse
 // duplicate segments within one location.
 function cleanSingleLocation(loc) {
   if (!loc) return ''
+  const override = LOCATION_OVERRIDES[loc.toLowerCase().trim()]
+  if (override) return override
   const seen = new Set()
   const parts = []
   for (const raw of loc.split(',')) {
