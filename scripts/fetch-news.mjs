@@ -255,7 +255,8 @@ function cleanSingleLocation(loc) {
   const resultLow = result.toLowerCase()
   if (resultLow.includes('gaza')) return 'Gaza, Palestine'
   if (resultLow.includes('west bank')) return 'West Bank, Palestine'
-  return result
+  // Strip non-ASCII characters that render as ? on some devices.
+  return result.replace(/[^\x00-\x7F一-鿿㐀-䶿]/g, '')
 }
 
 // Merge several distinct GDELT location strings into one display string.
